@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "d3": "^7.1.1",
     "normalize.css": "^8.0.1",
+    "v-click-outside": "^3.1.2",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.1",
     "vue-svg-loader": "^0.16.0",

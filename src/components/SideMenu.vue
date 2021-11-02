@@ -35,10 +35,10 @@
           <Doughnut ref="chart" />
         </div>
       </div>
-      <div v-else class="profile">
+      <div v-else class="profile" v-click-outside="onClickOutside">
         <div v-if="!person" class="profile__empty">Место пустое</div>
 
-        <PersonCard :person="person" />
+        <div v-else><PersonCard :person="person" /></div>
       </div>
     </div>
   </div>
@@ -48,8 +48,6 @@
 import Draggable from "vuedraggable";
 import LegendItem from "./SideMenu/LegendItem.vue";
 import PersonCard from "./SideMenu/PersonCard.vue";
-import legend from "@/assets/data/legend.json";
-import tables from "@/assets/data/tables.json";
 import { Doughnut } from "vue-chartjs";
 
 export default {
@@ -62,22 +60,20 @@ export default {
       type: Object,
       default: null,
     },
+    tables: {
+      type: Array,
+      default: () => [],
+    },
+    legend: {
+      type: Array,
+      default: () => [],
+    },
   },
   components: {
     LegendItem,
     PersonCard,
     Doughnut,
     Draggable,
-  },
-  data() {
-    return {
-      legend: [],
-      tables: [],
-    };
-  },
-  created() {
-    this.loadTables();
-    this.loadLegend();
   },
   mounted() {
     this.makeChart();
@@ -88,12 +84,6 @@ export default {
     }
   },
   methods: {
-    loadTables() {
-      this.tables = tables;
-    },
-    loadLegend() {
-      this.legend = legend.map(this.normalizeLegend);
-    },
     closeProfile() {
       this.$emit("update:isUserOpenned", false);
     },
@@ -111,14 +101,8 @@ export default {
       const options = {};
       this.$refs.chart.renderChart(chartData, options);
     },
-    getLegendCounter(id) {
-      return this.tables.filter(({ group_id }) => group_id === id).length;
-    },
-    normalizeLegend(legendItem) {
-      return {
-        ...legendItem,
-        counter: this.getLegendCounter(legendItem.group_id),
-      };
+    onClickOutside() {
+      this.$emit("update:isUserOpenned", false);
     },
   },
 };

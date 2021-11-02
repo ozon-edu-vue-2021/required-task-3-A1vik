@@ -4,10 +4,14 @@
       <Map
         @setCurrentUser="setCurrentUser"
         @setIsUserOpenned="setIsUserOpenned"
+        :tables="normalizeTables"
+        :people="people"
+        :legend="getLegend"
       />
       <SideMenu
         :isUserOpenned="isUserOpenned"
         :person="currentUser"
+        :legend="getLegend"
         @update:isUserOpenned="setIsUserOpenned"
       />
     </div>
@@ -17,6 +21,9 @@
 <script>
 import Map from "./components/Map.vue";
 import SideMenu from "./components/SideMenu.vue";
+import legend from "./assets/data/legend.json";
+import people from "./assets/data/people.json";
+import tables from "./assets/data/tables.json";
 
 export default {
   name: "App",
@@ -28,6 +35,9 @@ export default {
     return {
       currentUser: null,
       isUserOpenned: false,
+      people: [],
+      tables: [],
+      legend: [],
     };
   },
   methods: {
@@ -37,6 +47,43 @@ export default {
     setIsUserOpenned(isOpen) {
       this.isUserOpenned = isOpen;
     },
+    loadTables() {
+      this.tables = tables;
+    },
+    loadPeople() {
+      this.people = people;
+    },
+    loadLegend() {
+      this.legend = legend;
+    },
+    getLegendCounter(id) {
+      return this.tables.filter(({ group_id }) => group_id === id).length;
+    },
+    normalizeLegend(legendItem) {
+      return {
+        ...legendItem,
+        counter: this.getLegendCounter(legendItem.group_id),
+      };
+    },
+  },
+  computed: {
+    getUsersId() {
+      return this.people.map((user) => user._id);
+    },
+    normalizeTables() {
+      return tables.map((table) => ({
+        ...table,
+        isEmpty: !this.getUsersId.includes(table._id),
+      }));
+    },
+    getLegend() {
+      return this.legend.map(this.normalizeLegend);
+    },
+  },
+  created() {
+    this.loadLegend();
+    this.loadPeople();
+    this.loadTables();
   },
 };
 </script>

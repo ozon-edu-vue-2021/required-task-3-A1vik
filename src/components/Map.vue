@@ -15,32 +15,38 @@
 import * as d3 from "d3";
 import MapSVG from "@/assets/images/map.svg";
 import TableSVG from "@/assets/images/workPlace.svg";
-import tables from "@/assets/data/tables.json";
-import legend from "@/assets/data/legend.json";
-import people from "@/assets/data/people.json";
 
 export default {
   components: {
     MapSVG,
     TableSVG,
   },
+  props: {
+    tables: {
+      type: Array,
+      required: true,
+    },
+    people: {
+      type: Array,
+      required: true,
+    },
+    legend: {
+      type: Array,
+      default: () => [],
+    },
+  },
   data() {
     return {
       isLoading: false,
       svg: null,
       g: null,
-      tables: [],
       tableSVG: null,
-      people: [],
     };
   },
   mounted() {
-    this.loadPeople();
     this.svg = d3.select(this.$refs.svg);
     this.g = this.svg.select("g");
     this.tableSVG = d3.select(this.$refs.table);
-
-    this.tables = tables;
 
     if (this.g) {
       this.drawTables();
@@ -49,9 +55,6 @@ export default {
     }
   },
   methods: {
-    loadPeople() {
-      this.people = people;
-    },
     drawTables() {
       const svgTablesGroup = this.g.append("g").classed("groupPlaces", true);
       console.log(svgTablesGroup);
@@ -70,7 +73,7 @@ export default {
           .html(this.tableSVG.html())
           .attr(
             "fill",
-            legend.find((it) => it.group_id === table.group_id)?.color ??
+            this.legend.find((it) => (it.group_id === table.group_id) && !table.isEmpty)?.color ??
               "transparent"
           );
 
